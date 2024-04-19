@@ -45,8 +45,8 @@ Make OpenWrt to log to a file i.e. /tmp/system.log. Optionally make firewall to 
       - 'drop wan in: .* SRC=([0-9.]+) .* DPT=9101'
       - 'drop wan in: .* SRC=([0-9.]+) .* DPT=1121'
     cmds:
-      - 'uci set firewall.cfgxxxx.src_ip="{0}"'
-      - 'uci del firewall.cfgxxx.enabled'
+      - 'uci set firewall.cfgxxxx.src_ip={0}'
+      - 'uci set firewall.cfgxxx.enabled=1'
       - 'uci commit'
 ```
 
