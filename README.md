@@ -2,7 +2,7 @@
 Logknockd is a simple "log knocking" daemon which monitors given logfile and runs commands when sequence of matches are detected. One use case would be monitoring firewall logs and opening access when given sequence of "port knocks" are detected, but you may find other use cases as well.
 
 # Why 
-Was looking for port knocking daemon for OpenWrt, but knockd seems to be abandoned and more advanced fwknopd lacks up to date Android client. Other options tried to directly modify iptables which is a huge mess etc. So had to write yet another solution.
+Was looking for port knocking daemon for OpenWrt, but knockd seems to be abandoned and more advanced fwknopd lacks up to date Android client.  Other options tried to directly modify iptables which is a huge mess etc. So had to write yet another solution.
 
 # Installation
 Clone:
@@ -29,6 +29,9 @@ Rule options:
 * ```sequence``` - Array of filters which must be matched in correct sequence in order for commands to be ran. Capturing groups can be used to capture information for the commands to be ran.
 * ```cmds``` - Array of commands to be ran if sequence was completed. Captured groups from last match are used as parameters, {0}, {1}, {2}... can be used in command to represent captured values.
 
+# Clients
+Simple port knocking clients do exist for many plateforms. E.g. for Android Knock on Ports seem to work well.
+
 # Examples
 
 ## OpenWrt
@@ -49,5 +52,11 @@ Make OpenWrt to log to a file i.e. /tmp/system.log. Optionally make firewall to 
 
 This will match port knocking sequence 1234, 5678, 9101, 1121 and then will enable and update port forwarding rule to allow traffic from you IP.
 
+# Security
+* Notice that port knocking is kind of securty by obscurity and should not be used as primary security method. It should be used as additional method only.
+* For port knocking purposes we cannot inspect packet contents (unlike knockd) nor can we do as advanced security as fwknopd does. So this is very simple daemon but for many use cases more than enough.
+* Do not run any crazy commands which could open more security holes. Enabling existing firewall rule could be ok.
+* Generally know what you are doing. Don't blame me if something bad happens.
 
-
+# TODO
+* There are no "timeout" mechanism which could e.g. automatically disable port forwarding after a while. 
