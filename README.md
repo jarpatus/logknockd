@@ -20,15 +20,34 @@ pip3 install python-config-parser watchfiles
 
 # Configuration
 Customize logknockd.yaml for your needs. Top level configuration options:
-* file - File to watch i.e. /var/log/system.log
-* ruleset - Array of rules which do work indepedently
+* ```file``` - File to watch i.e. /var/log/system.log
+* ```ruleset``` - Array of rules which do work indepedently
 
 Rule options:
-* name - Name of the rule
-* filter - High level filter (regular expression) which must be matched or row will be ignored. Regular expression must have one capturing group which "groups" rows together. I.e. for firewall logs source IP could be used so if logs are bombarded with port scans your own port knocking sequence will still be identifiable.
-* sequence - Array of filters which must be matched in correct sequence in order for commands to be ran. Capturing groups can be used to capture information for the commands to be ran.
-* cmds - Array of commands to be ran if sequence was completed. Captured groups from last match are used as parameters, {0}, {1}, {2}... can be used in command to represent captured values.
+* ```name``` - Name of the rule
+* ```filter``` - High level filter (regular expression) which must be matched or row will be ignored. Regular expression must have one capturing group which "groups" rows together. I.e. for firewall logs source IP could be used so if logs are bombarded with port scans your own port knocking sequence will still be identifiable.
+* ```sequence``` - Array of filters which must be matched in correct sequence in order for commands to be ran. Capturing groups can be used to capture information for the commands to be ran.
+* ```cmds``` - Array of commands to be ran if sequence was completed. Captured groups from last match are used as parameters, {0}, {1}, {2}... can be used in command to represent captured values.
 
+# Examples
+
+## OpenWrt
+Make OpenWrt to log to a file i.e. /tmp/system.log. Optionally make firewall to drop instead of reject (example uses drop). Create port forwarding firewall rules. Then use configuration like this:
+```
+  - name: Enable port forward
+    filter: 'drop wan in: .* SRC=([0-9.]+)'
+    sequence:
+      - 'drop wan in: .* SRC=([0-9.]+) .* DPT=1234'
+      - 'drop wan in: .* SRC=([0-9.]+) .* DPT=5678'
+      - 'drop wan in: .* SRC=([0-9.]+) .* DPT=9101'
+      - 'drop wan in: .* SRC=([0-9.]+) .* DPT=1121'
+    cmds:
+      - 'uci set firewall.cfgxxxx.src_ip="{0}"'
+      - 'uci del firewall.cfgxxx.enabled'
+      - 'uci commit'
+```
+
+This will match port knocking sequence 1234, 5678, 9101, 1121 and then will enable and update port forwarding rule to allow traffic from you IP.
 
 
 
