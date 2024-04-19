@@ -4,4 +4,22 @@ Logknockd is a simple "log knocking" daemon which monitors given logfile and run
 # Why 
 Was looking for port knocking daemon for OpenWrt, but knockd seems to be abandoned and more advanced fwknopd lacks up to date Android client. Other options tried to directly modify iptables which is a huge mess etc. So had to write yet another solution.
 
-# How
+# Installation
+Clone:
+```
+git clone https://github.com/jarpatus/logknockd.git logknockd
+```
+
+Create python virtual environment: 
+```
+mkdir logknockd
+cd logknockd
+python3 -m venv venv
+source venv/bin
+
+```
+
+# Configuration
+
+# 
+
