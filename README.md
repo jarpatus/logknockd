@@ -13,11 +13,11 @@ git clone https://github.com/jarpatus/logknockd.git logknockd
 Python 3 is needed, no additional packages required. For OpenWrt python3-light is enough. This is why we do polling etc. instead of fancy inotify or so packages.
 
 # Configuration
-Customize logknockd.conf for your needs (it's JSON). Top level properties:
+Copy logknockd.conf from examples/ to the same directory where logknockd.py resides. Customize for your needs (it's JSON). Top level properties:
+* ```trace``` - Enable trace logging - do not use lightheartly, espeially if logging goes to the same log which is monitored as infinite loop will occur
+* ```debug``` - Enable debug logging
 * ```file``` - File to watch i.e. /var/log/system.log
 * ```ruleset``` - Array of rules which do work indepedently
-* ```debug``` - Enable debug logging
-* ```trace``` - Enable trace logging - do not use lightheartly, espeially if logging goes to the same log which is monitoring as infinite loop will occur
 
 Rule properties:
 * ```name``` - Name of the rule
@@ -28,34 +28,15 @@ Rule properties:
 # Clients
 Simple port knocking clients do exist for many platforms. E.g. for Android Knock on Ports seem to work well.
 
-# Examples
+# Guides
 
 ## OpenWrt
-Make OpenWrt to log to a file i.e. /tmp/system.log. Optionally make firewall to drop instead of reject (example uses drop). Create port forwarding firewall rules. Then use configuration like this:
-```
-{
-  "file": "/tmp/system.log",
-  "ruleset": [
-    {
-      "name": "Open ports",
-      "filter": "drop wan in: .* SRC=([0-9.]+) .* PROTO=UDP",
-      "sequence": [
-        "drop wan in: .* SRC=([0-9.]+) .* DPT=1234",
-        "drop wan in: .* SRC=([0-9.]+) .* DPT=5678",
-        "drop wan in: .* SRC=([0-9.]+) .* DPT=8765",
-        "drop wan in: .* SRC=([0-9.]+) .* DPT=4321"
-      ],
-      "cmds": [
-        "uci set firewall.cfgxxx.src_ip={0}",
-        "uci set firewall.cfgxxx.enabled=1",
-        "uci commit"
-      ]
-    }
-  ]
-}
-```
-
-This will match port knocking sequence 1234, 5678, 8765, 4321 and then will enable and update port forwarding rule to allow traffic from you IP. Idea is not to mess with iptables or nftables directly but to toggle and modify ready made firewall rules.
+* Make OpenWrt to log system log to /tmp/system.log, from System -> System -> Logging -> Write system log to file.
+* Make firewall to drop packets instead of reject, from Network -> Firewall -> Zones -> wan. Optional but update filters in case of reject.
+* Make firewall to log dropped / rejected packets,  from Network -> Firewall -> Zones -> wan -> Edit -> Advanced settings -> Enable logging on this zone
+* Create some port forwards
+* Use configuration example from examples/openwrt/logknockd.conf, customize based on your needs. Idea is not to mess with iptables or nftables directly but to update firewall rules with correct sourcer IP.
+* Copy examples/openwrt/logknockd.init to /etc/init.d/logknockd and enable service.
 
 # Security
 * Notice that port knocking is kind of securty by obscurity and should not be used as primary security method. It should be used as additional method only.
