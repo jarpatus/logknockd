@@ -5,16 +5,16 @@ import re
 import subprocess
 from time import sleep
 
-def trace(msg):
+def trace(msg): 
   if conf['trace']: print('[TRACE]', msg)
 
-def debug(msg):
+def debug(msg): 
   if conf['debug']: print('[DEBUG]', msg)
 
-def info(msg):
+def info(msg): 
   print('[INFO]', msg)
 
-def error(msg):
+def error(msg): 
   print('[ERROR]', msg)
 
 def getConf():
@@ -27,11 +27,11 @@ def tail(noSeek=False):
   info('logknockd tailing {}...'.format(conf['file']))
   while True:
     file = open(conf['file'], 'r')
-    if not noSeek: file.seek(0, os.SEEK_END)
+    if not noSeek: file.seek(0, os.SEEK_END)  
     noSeek = read(file)
     file.close()
 
-def read(file):
+def read(file): 
   stat = None
   while True:
     newstat = os.stat(conf['file'])
@@ -41,13 +41,13 @@ def read(file):
       return True
     if stat is not None and newstat.st_size < stat.st_size:
       debug('File truncated, seek to start...')
-      file.seek(0)
+      file.seek(0)      
     if stat is None or newstat.st_mtime > stat.st_mtime:
       while row := file.readline(): checkRuleset(row.strip())
     stat = newstat
     sleep(3)
-
-def checkRuleset(row):
+ 
+def checkRuleset(row): 
   trace('Check row against ruleset: {}'.format(row))
   for rule in conf['ruleset']:
     match = re.search(rule['filter'], row);
@@ -57,20 +57,20 @@ def checkRuleset(row):
       if key not in buffers: buffers[key] = []
       buffer = buffers[key]
       buffer.append(row)
-      while len(buffer) > len(rule['sequence']):
+      while len(buffer) > len(rule['sequence']): 
         buffer.pop(0)
-      if len(buffer) == len(rule['sequence']):
+      if len(buffer) == len(rule['sequence']): 
         checkBuffer(rule, buffer)
 
 def checkBuffer(rule, buffer):
   trace('Checking rule {} buffer: {}'.format(rule['name'], buffer))
-  for i in range(len(rule['sequence'])):
+  for i in range(len(rule['sequence'])): 
     match = re.search(rule['sequence'][i], buffer[i])
-    if match == None: return
+    if match == None: return 
     debug('Rule {} sequence {} match.'.format(rule['name'], i))
   runCommands(rule, match)
 
-def runCommands(rule, match):
+def runCommands(rule, match): 
   info('Rule {} buffer matched sequence, running commands...'.format(rule['name']))
   for cmd in rule['cmds']:
     run = cmd.format(*match.groups())
@@ -83,6 +83,6 @@ buffers = {}
 while True:
   try:
     tail()
-  except Exception as e:
+  except Exception as e: 
     error('Exception: {}'.format(repr(e)))
   sleep(10)
