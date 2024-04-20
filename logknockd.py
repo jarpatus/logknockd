@@ -5,20 +5,26 @@ import re
 import subprocess
 from time import sleep
 
-buffers = {}
+def trace(msg):
+  if conf['trace']: print('[TRACE]', msg)
 
-def debug(msg): print('[DEBUG]', msg)
-def info(msg): print('[DEBUG]', msg)
-def error(msg): print('[DEBUG]', msg)
+def debug(msg):
+  if conf['debug']: print('[DEBUG]', msg)
+
+def info(msg):
+  print('[INFO]', msg)
+
+def error(msg):
+  print('[ERROR]', msg)
 
 def getConf():
-  file = open('logknockd.conf', 'r')
+  file = open(os.path.dirname(__file__)+'/logknockd.conf', 'r')
   conf = json.load(file)
   file.close()
   return conf
 
 def tail(noSeek=False):
-  info('Tailing {}...'.format(conf['file']))
+  info('logknockd tailing {}...'.format(conf['file']))
   while True:
     file = open(conf['file'], 'r')
     if not noSeek: file.seek(0, os.SEEK_END)
@@ -42,7 +48,7 @@ def read(file):
     sleep(3)
 
 def checkRuleset(row):
-  debug('Check row against ruleset: {}'.format(row))
+  trace('Check row against ruleset: {}'.format(row))
   for rule in conf['ruleset']:
     match = re.search(rule['filter'], row);
     if match != None:
@@ -57,7 +63,7 @@ def checkRuleset(row):
         checkBuffer(rule, buffer)
 
 def checkBuffer(rule, buffer):
-  debug('Checking rule {} buffer: {}'.format(rule['name'], buffer))
+  trace('Checking rule {} buffer: {}'.format(rule['name'], buffer))
   for i in range(len(rule['sequence'])):
     match = re.search(rule['sequence'][i], buffer[i])
     if match == None: return
@@ -72,10 +78,11 @@ def runCommands(rule, match):
     subprocess.run(run.split())
 
 conf = getConf();
+buffers = {}
 
 while True:
   try:
     tail()
   except Exception as e:
-    error(e)
+    error('Exception: {}'.format(repr(e)))
   sleep(10)
