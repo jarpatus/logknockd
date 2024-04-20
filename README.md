@@ -10,7 +10,7 @@ Clone:
 git clone https://github.com/jarpatus/logknockd.git logknockd
 ```
 
-No additional python packages needed. For OpenWrt python3-light is enough. This is why we do polling etc. instead of fancy inotify or so packages.
+Python 3 is needed, no additional packages required. For OpenWrt python3-light is enough. This is why we do polling etc. instead of fancy inotify or so packages.
 
 # Configuration
 Customize logknockd.conf for your needs (it's JSON). Top level properties:
