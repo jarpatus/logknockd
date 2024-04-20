@@ -16,6 +16,8 @@ No additional python packages needed. For OpenWrt python3-light is enough. This 
 Customize logknockd.conf for your needs (it's JSON). Top level properties:
 * ```file``` - File to watch i.e. /var/log/system.log
 * ```ruleset``` - Array of rules which do work indepedently
+* ```debug``` - Enable debug logging
+* ```trace``` - Enable trace logging - do not use lightheartly, espeially if logging goes to the same log which is monitoring as infinite loop will occur
 
 Rule properties:
 * ```name``` - Name of the rule
