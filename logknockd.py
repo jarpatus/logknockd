@@ -46,7 +46,6 @@ def notify(file):
   while row := file.readline(): checkRuleset(row.strip())
   while True:
    for event in inotify.read():
-    print(event)
     if event.mask & event.mask & flags.MOVE_SELF:
       debug('File moved or deleted, re-opening...')
       while row := file.readline(): checkRuleset(row.strip())
