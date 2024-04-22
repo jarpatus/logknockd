@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 from time import sleep
+from inotify_simple.inotify_simple import INotify, flags
 
 def trace(msg): 
   if conf['trace']: print('[TRACE]', msg)
@@ -26,12 +27,36 @@ def getConf():
 def tail(noSeek=False):
   info('logknockd tailing {}...'.format(conf['file']))
   while True:
+    debug('Opening {}...'.format(conf['file']))
     file = open(conf['file'], 'r')
     if not noSeek: file.seek(0, os.SEEK_END)  
-    noSeek = read(file)
+    noSeek = notify(file)
     file.close()
+    sleep(3)
 
-def read(file): 
+#
+# Note that inotify cannot tell us if file was truncated, nor deleted (because we have open handles DELETE_SELF won't work).
+# In typical log monitoring scenarios this does not happen though so let's blissfully ignore this and poll can be used instead 
+# if truncates or deletes happens. It would also be possible to write hybrid function using os.stat() when flags.ATTRIB is 
+# is detected but let's be hyper resource conservative as well with this function.
+#
+def notify(file):
+  inotify = INotify()
+  wd = inotify.add_watch(conf['file'], flags.MODIFY | flags.MOVE_SELF)
+  while row := file.readline(): checkRuleset(row.strip())
+  while True:
+   for event in inotify.read():
+    print(event)
+    if event.mask & event.mask & flags.MOVE_SELF:
+      debug('File moved or deleted, re-opening...')
+      while row := file.readline(): checkRuleset(row.strip())
+      inotify.rm_watch(wd)
+      return True
+    if event.mask & flags.MODIFY:
+      trace('File modified, reading...')
+      while row := file.readline(): checkRuleset(row.strip())
+
+def poll(file): 
   stat = None
   while True:
     newstat = os.stat(conf['file'])
