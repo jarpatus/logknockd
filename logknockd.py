@@ -96,7 +96,7 @@ def checkBuffer(rule, buffer):
 
 def runCommands(rule, match): 
   info('Rule {} buffer matched sequence, running commands...'.format(rule['name']))
-  for cmd in rule['cmds']:
+  for cmd in rule['actions']:
     run = cmd.format(*match.groups())
     info(run)
     subprocess.run(run.split())

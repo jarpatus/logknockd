@@ -23,7 +23,7 @@ Rule properties:
 * ```name``` - Name of the rule
 * ```filter``` - High level filter (regular expression) which must be matched or row will be ignored. Regular expression must have one capturing group which "groups" rows together. I.e. for firewall logs source IP could be used so if logs are bombarded with port scans your own port knocking sequence will still be identifiable.
 * ```sequence``` - Array of filters which must be matched in correct sequence in order for commands to be ran. Capturing groups can be used to capture information for the commands to be ran.
-* ```cmds``` - Array of commands to be ran if sequence was completed. Captured groups from last match are used as parameters, {0}, {1}, {2}... can be used in command to represent captured values.
+* ```actions``` - Array of commands to be ran if sequence was completed. Captured groups from last match are used as parameters, {0}, {1}, {2}... can be used in command to represent captured values.
 
 # Clients
 Simple port knocking clients do exist for many platforms. E.g. for Android Knock on Ports seem to work well.
